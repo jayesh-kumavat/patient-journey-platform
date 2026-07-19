@@ -101,7 +101,7 @@ def main():
             )
         fig = px.bar(rx_by_therapy, x="therapy_area", y="volume", color="therapy_area")
         fig.update_layout(showlegend=False)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     except Exception as e:
         st.error(f"Could not load chart: {e}")
 
@@ -128,7 +128,7 @@ def main():
             if switches.empty:
                 st.info("No therapy switches for this filter")
             else:
-                st.dataframe(switches, use_container_width=True, hide_index=True)
+                st.dataframe(switches, width='stretch', hide_index=True)
         except Exception as e:
             st.warning(f"No switch data: {e}")
 
@@ -142,7 +142,7 @@ def main():
             if anomalies.empty:
                 st.info("No anomalies detected")
             else:
-                st.dataframe(anomalies, use_container_width=True, hide_index=True)
+                st.dataframe(anomalies, width='stretch', hide_index=True)
         except Exception as e:
             st.warning(f"No anomaly data: {e}")
 
@@ -168,7 +168,7 @@ def main():
         else:
             daily["prescription_date"] = pd.to_datetime(daily["prescription_date"])
             fig = px.line(daily, x="prescription_date", y="volume")
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
     except Exception as e:
         st.error(str(e))
 
@@ -184,7 +184,7 @@ def main():
             if journey.empty:
                 st.warning("No journey data for this patient")
             else:
-                st.dataframe(journey, use_container_width=True, hide_index=True)
+                st.dataframe(journey, width='stretch', hide_index=True)
         except Exception as e:
             st.error(str(e))
 

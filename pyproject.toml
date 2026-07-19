@@ -3,6 +3,10 @@ name = "patient-journey-platform"
 version = "0.1.0"
 requires-python = ">=3.10"
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["config*", "src*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-v --tb=short"
