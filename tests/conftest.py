@@ -22,14 +22,19 @@ TEST_DB_URL = f"postgresql://{DB_USER}:{quote_plus(DB_PASSWORD)}@{DB_HOST}:{DB_P
 
 
 def _ensure_test_db_exists():
-    conn = psycopg2.connect(host=DB_HOST, port=DB_PORT, dbname="postgres", user=DB_USER, password=DB_PASSWORD)
-    conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-    cur = conn.cursor()
-    cur.execute(f"SELECT 1 FROM pg_database WHERE datname = '{TEST_DB_NAME}'")
-    if not cur.fetchone():
-        cur.execute(f"CREATE DATABASE {TEST_DB_NAME}")
-    cur.close()
-    conn.close()
+    conn = None
+    try:
+        conn = psycopg2.connect(host=DB_HOST, port=DB_PORT, dbname="postgres", user=DB_USER, password=DB_PASSWORD)
+        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = conn.cursor()
+        cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (TEST_DB_NAME,))
+        if not cur.fetchone():
+            from psycopg2.extensions import quote_ident
+            cur.execute(f"CREATE DATABASE {quote_ident(TEST_DB_NAME, cur)}")
+        cur.close()
+    finally:
+        if conn:
+            conn.close()
 
 
 _ensure_test_db_exists()

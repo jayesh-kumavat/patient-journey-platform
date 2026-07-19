@@ -4,7 +4,7 @@ Used when we don't want to do a full refresh every time.
 """
 
 from config.settings import get_db_url
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 import pandas as pd
 import logging
@@ -17,7 +17,7 @@ def get_engine():
 
 def get_last_watermark(engine, table_name: str) -> Optional[str]:
     try:
-        result = pd.read_sql(f"SELECT MAX(ingested_at) as last_watermark FROM {table_name}", engine)
+        result = pd.read_sql("SELECT MAX(ingested_at) as last_watermark FROM " + table_name, engine)
         val = result["last_watermark"].iloc[0]
         return val if val else None
     except Exception:
@@ -28,10 +28,10 @@ def load_incremental(engine, source_table: str, target_table: str, key_column: s
     watermark = get_last_watermark(engine, target_table)
 
     if watermark:
-        query = f"SELECT * FROM {source_table} WHERE ingested_at > :wm"
+        query = "SELECT * FROM " + source_table + " WHERE ingested_at > :wm"
         df = pd.read_sql(query, engine, params={"wm": watermark})
     else:
-        df = pd.read_sql(f"SELECT * FROM {source_table}", engine)
+        df = pd.read_sql("SELECT * FROM " + source_table, engine)
 
     if df.empty:
         logger.info(f"No new records in {source_table}")
@@ -43,7 +43,7 @@ def load_incremental(engine, source_table: str, target_table: str, key_column: s
         if keys:
             placeholders = ",".join([f":k{i}" for i in range(len(keys))])
             params = {f"k{i}": k for i, k in enumerate(keys)}
-            conn.execute(text(f"DELETE FROM {target_table} WHERE {key_column} IN ({placeholders})"), params)
+            conn.execute(text("DELETE FROM " + target_table + " WHERE " + key_column + " IN (" + placeholders + ")"), params)
         conn.commit()
 
     df.to_sql(target_table, engine, if_exists="append", index=False)
@@ -52,7 +52,8 @@ def load_incremental(engine, source_table: str, target_table: str, key_column: s
 
 
 def record_pipeline_run(engine, pipeline_name: str, status: str, records_processed: int, records_failed: int = 0):
-    run_id = f"{pipeline_name}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+    now = datetime.now(timezone.utc)
+    run_id = f"{pipeline_name}_{now.strftime('%Y%m%d_%H%M%S')}"
     with engine.connect() as conn:
         conn.execute(
             text(
@@ -61,8 +62,8 @@ def record_pipeline_run(engine, pipeline_name: str, status: str, records_process
             ),
             {
                 "rid": run_id, "name": pipeline_name, "status": status,
-                "started": datetime.utcnow().isoformat(),
-                "completed": datetime.utcnow().isoformat(),
+                "started": now.isoformat(),
+                "completed": now.isoformat(),
                 "processed": records_processed, "failed": records_failed,
             }
         )

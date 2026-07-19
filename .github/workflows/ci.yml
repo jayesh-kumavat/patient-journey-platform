@@ -16,7 +16,7 @@ jobs:
         env:
           POSTGRES_DB: patient_journey_test
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -40,4 +40,4 @@ jobs:
           DB_PORT: 5432
           DB_NAME: patient_journey_test
           DB_USER: postgres
-          DB_PASSWORD: postgres
+          DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}

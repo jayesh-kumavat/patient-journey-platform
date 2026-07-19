@@ -20,20 +20,16 @@ def get_anomalies(
     limit: int = Query(50, le=500),
 ):
     engine = get_engine()
+    params = {"lim": limit, "dt": date, "conf": min_confidence}
 
-    # build query dynamically based on filters
-    conditions = ["1=1"]
-    params = {"lim": limit}
-
-    if date:
-        conditions.append("detection_date = :dt")
-        params["dt"] = date
-    if min_confidence > 0:
-        conditions.append("confidence >= :conf")
-        params["conf"] = min_confidence
-
-    where = " AND ".join(conditions)
-    query = f"SELECT * FROM anomaly_results WHERE {where} ORDER BY anomaly_score ASC LIMIT :lim"
+    if date and min_confidence > 0:
+        query = "SELECT * FROM anomaly_results WHERE detection_date = :dt AND confidence >= :conf ORDER BY anomaly_score ASC LIMIT :lim"
+    elif date:
+        query = "SELECT * FROM anomaly_results WHERE detection_date = :dt ORDER BY anomaly_score ASC LIMIT :lim"
+    elif min_confidence > 0:
+        query = "SELECT * FROM anomaly_results WHERE confidence >= :conf ORDER BY anomaly_score ASC LIMIT :lim"
+    else:
+        query = "SELECT * FROM anomaly_results ORDER BY anomaly_score ASC LIMIT :lim"
 
     df = pd.read_sql(text(query), engine, params=params)
     return {

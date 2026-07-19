@@ -1,8 +1,11 @@
 """Central config. Reads from .env file."""
 
+import logging
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -17,36 +20,38 @@ DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "patient_journey")
 DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 
 from urllib.parse import quote_plus
-DATABASE_URL = f"postgresql://{DB_USER}:{quote_plus(DB_PASSWORD)}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 
-def get_db_url():
-    """Return the database URL. Keeping this as a function in case
-    we need to add logic later (like reading from secrets manager)."""
-    return DATABASE_URL
+def get_db_url() -> str:
+    """Build and return the database URL at call time."""
+    password = os.getenv("DB_PASSWORD", "")
+    return f"postgresql://{DB_USER}:{quote_plus(password)}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 
 def ensure_database_exists():
     import psycopg2
-    from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+    from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT, quote_ident
 
+    conn = None
     try:
         conn = psycopg2.connect(
             host=DB_HOST, port=DB_PORT, dbname="postgres",
-            user=DB_USER, password=DB_PASSWORD,
+            user=DB_USER, password=os.getenv("DB_PASSWORD", ""),
         )
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = conn.cursor()
-        cur.execute(f"SELECT 1 FROM pg_database WHERE datname = '{DB_NAME}'")
+        cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (DB_NAME,))
         if not cur.fetchone():
-            cur.execute(f"CREATE DATABASE {DB_NAME}")
+            safe_db_name = quote_ident(DB_NAME, cur)
+            cur.execute("CREATE DATABASE " + safe_db_name)
         cur.close()
-        conn.close()
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"Could not ensure database exists: {e}")
+    finally:
+        if conn:
+            conn.close()
 
 
 # aws config for prod

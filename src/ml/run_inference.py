@@ -3,7 +3,7 @@ Scoring pipeline - loads the trained model and flags anomalous physicians.
 """
 
 import pickle
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 from sqlalchemy import create_engine, MetaData, Table, Column, String, Float, Integer
 from typing import Dict
@@ -110,7 +110,7 @@ def run_inference() -> Dict:
     # save only the anomalous ones
     anomalies = scored[scored["is_anomaly"]].copy()
     anomalies["anomaly_type"] = "prescription_volume"
-    anomalies["detection_date"] = datetime.utcnow().strftime("%Y-%m-%d")
+    anomalies["detection_date"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     anomalies["explanation"] = anomalies.apply(generate_explanations, axis=1)
 
     output_cols = [

@@ -4,7 +4,7 @@ Records that fail go to quarantine CSVs.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Tuple
 import csv
 from pathlib import Path
@@ -16,14 +16,13 @@ logger = logging.getLogger(__name__)
 
 SCHEMAS_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "schemas" / "data_schemas.json"
 
-_schemas_cache = None
+_schemas: Dict = {}
 
 def load_schemas() -> Dict:
-    global _schemas_cache
-    if _schemas_cache is None:
+    if not _schemas:
         with open(SCHEMAS_PATH) as f:
-            _schemas_cache = json.load(f)
-    return _schemas_cache
+            _schemas.update(json.load(f))
+    return _schemas
 
 
 def validate_record(record: Dict, schema: Dict) -> Tuple[bool, str]:
@@ -62,7 +61,8 @@ def validate_file(filepath: Path, dataset_type: str) -> Tuple[List[Dict], List[D
     valid = []
     invalid = []
 
-    with open(filepath, "r", encoding="utf-8") as f:
+    resolved = filepath.resolve()
+    with open(resolved, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row_num, row in enumerate(reader, start=1):
             ok, error = validate_record(row, schema)
@@ -79,13 +79,14 @@ def validate_file(filepath: Path, dataset_type: str) -> Tuple[List[Dict], List[D
 
 def quarantine_records(invalid_records: List[Dict], source_file: str) -> Path:
     QUARANTINE_DIR.mkdir(parents=True, exist_ok=True)
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     out_path = QUARANTINE_DIR / f"quarantine_{source_file}_{ts}.csv"
 
     if not invalid_records:
         return out_path
 
-    with open(out_path, "w", newline="", encoding="utf-8") as f:
+    resolved = out_path.resolve()
+    with open(resolved, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=invalid_records[0].keys())
         writer.writeheader()
         writer.writerows(invalid_records)

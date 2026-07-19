@@ -140,7 +140,12 @@ def inject_dirty_data(records, dirty_pct=0.05):
 def save_to_csv(records, filename, output_dir=None) -> Path:
     output_dir = output_dir or RAW_DIR
     output_dir.mkdir(parents=True, exist_ok=True)
-    filepath = output_dir / filename
+
+    # validate filename to prevent path traversal
+    safe_filename = Path(filename).name
+    filepath = (output_dir / safe_filename).resolve()
+    if not str(filepath).startswith(str(output_dir.resolve())):
+        raise ValueError(f"Invalid filename: {filename}")
 
     if not records:
         return filepath

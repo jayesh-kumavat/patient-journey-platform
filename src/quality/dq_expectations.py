@@ -4,7 +4,7 @@ Runs completeness, uniqueness, referential integrity, and distribution checks ag
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from config.settings import get_db_url
 from typing import List, Dict
 import pandas as pd
@@ -189,7 +189,7 @@ def generate_dq_report(checks: List[DataQualityCheck]) -> Dict:
     failed_details = [c.to_dict() for c in checks if not c.passed]
 
     return {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "total_checks": total,
         "passed": passed,
         "failed_count": total - passed,

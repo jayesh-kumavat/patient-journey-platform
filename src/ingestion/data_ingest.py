@@ -6,7 +6,7 @@ from pathlib import Path
 import logging
 from sqlalchemy import create_engine, text, MetaData, Table, Column, String, Integer, Float
 from typing import List, Dict
-from datetime import datetime
+from datetime import datetime, timezone
 from src.ingestion.schema_validator import validate_and_quarantine
 from config.settings import get_db_url, RAW_DIR
 import pandas as pd
@@ -86,7 +86,7 @@ def load_records_to_staging(engine, records: List[Dict], table_name: str) -> int
     if not records:
         return 0
 
-    ingested_at = datetime.utcnow().isoformat()
+    ingested_at = datetime.now(timezone.utc).isoformat()
     for r in records:
         r["ingested_at"] = ingested_at
 
@@ -121,7 +121,7 @@ def ingest_file(filepath: Path, dataset_type: str, engine=None) -> Dict:
         "file": str(filepath),
         "dataset_type": dataset_type,
         "records_loaded": loaded,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
 

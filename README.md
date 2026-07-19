@@ -81,6 +81,8 @@ pytest tests/ -v
 
 The test suite auto-creates the `patient_journey_test` database if it doesn't exist (handled in `conftest.py`).
 
+For CI (GitHub Actions), add `POSTGRES_PASSWORD` as a repository secret under `Settings → Secrets and variables → Actions`. The workflow reads it via `${{ secrets.POSTGRES_PASSWORD }}`.
+
 ## Project structure
 
 ```
