@@ -14,7 +14,23 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-You'll need a Postgres instance running. Copy `.env.example` to `.env` and fill in your password, then run the full pipeline:
+You'll need a Postgres instance running. Create a `.env` file in the project root with the following variables, then run the full pipeline:
+
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=patient_journey
+DB_USER=postgres
+DB_PASSWORD=your_password_here
+
+# Optional
+AWS_REGION=us-east-1
+S3_BUCKET=patient-journey-landing
+SNS_TOPIC_ARN=
+BATCH_SIZE=10000
+MAX_RETRIES=3
+ANOMALY_THRESHOLD=-0.5
+```
 
 ```bash
 python run_pipeline.py --all
