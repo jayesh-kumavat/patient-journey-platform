@@ -1,6 +1,7 @@
 from pathlib import Path
 import sys
 import csv
+from sqlalchemy import inspect
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -115,7 +116,6 @@ class TestSchemaValidator:
 class TestDataIngest:
     def test_staging_tables_created(self, test_engine):
         create_staging_tables(test_engine)
-        from sqlalchemy import inspect
         tables = inspect(test_engine).get_table_names()
         assert "stg_patients" in tables
         assert "stg_prescriptions" in tables

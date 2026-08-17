@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 import sys
 from pathlib import Path
-from sqlalchemy import inspect
+from sqlalchemy import inspect, text
 
 from src.processing.incremental_loader import get_last_watermark, record_pipeline_run
 from src.ingestion.data_ingest import create_staging_tables, load_records_to_staging
@@ -92,7 +92,6 @@ class TestWarehouseTransforms:
 class TestIncrementalLoader:
     @pytest.fixture(autouse=True)
     def setup(self, test_engine, sample_patients):
-        from sqlalchemy import text
         create_staging_tables(test_engine)
         load_records_to_staging(test_engine, sample_patients, "stg_patients")
         self.engine = test_engine
@@ -102,7 +101,6 @@ class TestIncrementalLoader:
         assert wm is not None
 
     def test_watermark_empty_table(self):
-        from sqlalchemy import text
         with self.engine.connect() as conn:
             conn.execute(text("DELETE FROM stg_patients"))
             conn.commit()

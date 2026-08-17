@@ -118,7 +118,7 @@ def run_inference() -> Dict:
         "confidence", "explanation"
     ]
     anomalies[output_cols].to_sql("anomaly_results", engine, if_exists="replace", index=False, dtype={
-        "anomaly_id": Integer(), "total_prescriptions": Integer(), "max_quantity": Integer(), "unique_patients": Integer(),
+        "total_prescriptions": Integer(), "max_quantity": Integer(), "unique_patients": Integer(),
         "detection_date": Date(), "avg_quantity": Numeric(10, 2), "confidence": Numeric(5, 4)
     })
 
