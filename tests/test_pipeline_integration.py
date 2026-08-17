@@ -48,6 +48,7 @@ from src.ml.run_inference import (
     create_anomaly_table,
     load_model,
     score_physicians,
+    generate_explanations,
 )
 
 logger = logging.getLogger(__name__)
@@ -352,6 +353,7 @@ class TestInference:
         if not anomalies.empty:
             anomalies["anomaly_type"] = "prescription_volume"
             anomalies["detection_date"] = datetime.now(timezone.utc).date()
+            anomalies["explanation"] = anomalies.apply(generate_explanations, axis=1)
             output_cols = [
                 "physician_id", "anomaly_score", "anomaly_type",
                 "total_prescriptions", "avg_quantity", "max_quantity",
