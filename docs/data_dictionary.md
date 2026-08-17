@@ -99,7 +99,6 @@ Patient dimension with Slowly Changing Dimension Type 2 support. When patient at
 
 | Column | Type | Description | Constraints |
 |--------|------|-------------|-------------|
-| patient_key | SERIAL | Surrogate key (auto-increment) | PK |
 | patient_id | VARCHAR(20) | Natural/business key for the patient | |
 | gender | VARCHAR(10) | Patient gender | |
 | date_of_birth | DATE | Patient date of birth | |
@@ -164,7 +163,6 @@ Unified event timeline combining prescriptions and diagnoses per patient. Used t
 
 | Column | Type | Description | Constraints |
 |--------|------|-------------|-------------|
-| journey_id | SERIAL | Surrogate key | PK |
 | patient_id | VARCHAR(20) | Patient this event belongs to | |
 | event_type | VARCHAR(50) | Event category (`prescription`, `diagnosis`) | |
 | event_date | DATE | When the event occurred | |
@@ -184,7 +182,6 @@ Records when a patient changes from one drug to another. Derived from consecutiv
 
 | Column | Type | Description | Constraints |
 |--------|------|-------------|-------------|
-| switch_id | SERIAL | Surrogate key | PK |
 | patient_id | VARCHAR(20) | Patient who switched therapy | |
 | from_drug | VARCHAR(100) | Drug the patient was previously on | |
 | to_drug | VARCHAR(100) | Drug the patient switched to | |
@@ -201,7 +198,6 @@ Output of the ML anomaly detection pipeline. Contains physicians flagged for unu
 
 | Column | Type | Description | Constraints |
 |--------|------|-------------|-------------|
-| anomaly_id | SERIAL | Surrogate key | PK |
 | physician_id | VARCHAR(20) | Flagged physician | FK → dim_physician |
 | anomaly_score | DOUBLE PRECISION | Isolation Forest decision function score (lower = more anomalous) | |
 | anomaly_type | VARCHAR(50) | Category of anomaly (`prescription_volume`) | |

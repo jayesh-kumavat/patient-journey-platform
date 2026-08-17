@@ -126,17 +126,16 @@ logger = logging.getLogger(__name__)
 
 DIM_PATIENT_DTYPES = {
     "date_of_birth": Date(), "enrollment_date": Date(),
-    "effective_from": Date(), "effective_to": Date(), "is_current": SmallInteger(),
-    "patient_key": Integer()
+    "effective_from": Date(), "effective_to": Date(), "is_current": SmallInteger()
 }
 DIM_PHYSICIAN_DTYPES = {"years_experience": Integer()}
 FACT_PRESCRIPTION_DTYPES = {
     "prescription_date": Date(), "quantity": Integer(), "refills": Integer()
 }
 FACT_JOURNEY_DTYPES = {
-    "event_date": Date(), "sequence_num": Integer(), "journey_id": Integer()
+    "event_date": Date(), "sequence_num": Integer()
 }
-THERAPY_SWITCHES_DTYPES = {"switch_date": Date(), "switch_id": Integer()}
+THERAPY_SWITCHES_DTYPES = {"switch_date": Date()}
 DIM_THERAPY_DTYPES = {"drug_count": Integer()}
 
 
@@ -148,7 +147,6 @@ def create_warehouse_tables(engine):
     metadata = MetaData()
 
     Table("dim_patient", metadata,
-        Column("patient_key", Integer, primary_key=True, autoincrement=True),
         Column("patient_id", String(20)),
         Column("gender", String(10)),
         Column("date_of_birth", Date),
@@ -183,7 +181,6 @@ def create_warehouse_tables(engine):
     )
 
     Table("fact_patient_journey", metadata,
-        Column("journey_id", Integer, primary_key=True, autoincrement=True),
         Column("patient_id", String(20)),
         Column("event_type", String(50)),
         Column("event_date", Date),
@@ -193,7 +190,6 @@ def create_warehouse_tables(engine):
     )
 
     Table("therapy_switches", metadata,
-        Column("switch_id", Integer, primary_key=True, autoincrement=True),
         Column("patient_id", String(20)),
         Column("from_drug", String(100)),
         Column("to_drug", String(100)),

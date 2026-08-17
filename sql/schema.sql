@@ -54,7 +54,6 @@ CREATE TABLE IF NOT EXISTS stg_claims (
 
 -- warehouse
 CREATE TABLE IF NOT EXISTS dim_patient (
-    patient_key SERIAL PRIMARY KEY,
     patient_id VARCHAR(20),
     gender VARCHAR(10),
     date_of_birth DATE,
@@ -90,7 +89,6 @@ CREATE TABLE IF NOT EXISTS fact_prescription (
 
 
 CREATE TABLE IF NOT EXISTS fact_patient_journey (
-    journey_id SERIAL PRIMARY KEY,
     patient_id VARCHAR(20),
     event_type VARCHAR(50),
     event_date DATE,
@@ -101,7 +99,6 @@ CREATE TABLE IF NOT EXISTS fact_patient_journey (
 
 
 CREATE TABLE IF NOT EXISTS therapy_switches (
-    switch_id SERIAL PRIMARY KEY,
     patient_id VARCHAR(20),
     from_drug VARCHAR(100),
     to_drug VARCHAR(100),
@@ -110,7 +107,6 @@ CREATE TABLE IF NOT EXISTS therapy_switches (
 );
 
 CREATE TABLE IF NOT EXISTS anomaly_results (
-    anomaly_id SERIAL PRIMARY KEY,
     physician_id VARCHAR(20),
     anomaly_score DOUBLE PRECISION,
     anomaly_type VARCHAR(50),

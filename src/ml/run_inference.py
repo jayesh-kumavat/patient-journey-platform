@@ -22,7 +22,6 @@ EXPLANATION_THRESHOLDS = {
 def create_anomaly_table(engine):
     metadata = MetaData()
     Table("anomaly_results", metadata,
-        Column("anomaly_id", Integer, primary_key=True, autoincrement=True),
         Column("physician_id", String(20)),
         Column("anomaly_score", Float),
         Column("anomaly_type", String(50)),
