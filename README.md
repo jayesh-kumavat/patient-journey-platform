@@ -74,7 +74,7 @@ docker exec -it <api-container> python run_pipeline.py --all
 pytest tests/ -v
 
 # Unit tests only
-pytest tests/test_transforms.py tests/test_ingestion.py tests/test_ml.py -v
+pytest tests/test_transforms.py tests/test_ingestion.py tests/test_ml.py tests/test_api.py tests/test_quality.py -v
 
 # Integration test (full pipeline e2e)
 pytest tests/test_pipeline_integration.py -v

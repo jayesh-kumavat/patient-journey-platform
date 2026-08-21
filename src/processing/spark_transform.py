@@ -115,7 +115,7 @@
 #     return counts
 
 
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from config.settings import get_db_url
 from typing import List, Dict
 import pandas as pd
@@ -231,7 +231,7 @@ def transform_patients(engine) -> pd.DataFrame:
     df = deduplicate_dataframe(df, "patient_id")
     df = normalize_dates(df, ["date_of_birth", "enrollment_date"])
 
-    df["effective_from"] = datetime.utcnow().date()
+    df["effective_from"] = datetime.now(timezone.utc).date()
     df["effective_to"] = date(9999, 12, 31)
     df["is_current"] = 1
 

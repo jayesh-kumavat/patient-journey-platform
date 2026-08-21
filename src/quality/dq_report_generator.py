@@ -26,7 +26,7 @@ def create_dq_scores_table(engine):
 
 def save_dq_report(report, engine=None):
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     path = REPORTS_DIR / f"dq_report_{ts}.json"
 
     with open(path, "w") as f:

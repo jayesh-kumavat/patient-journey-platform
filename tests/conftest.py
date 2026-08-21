@@ -7,6 +7,9 @@ from urllib.parse import quote_plus
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from psycopg2 import sql
 from sqlalchemy import create_engine, text
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
